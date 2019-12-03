@@ -2,18 +2,23 @@
 ## Lab 03 - Load balancing
 _Authors : Nair Alic & Adam Zouari_
 
+### Introduction
+
+...
+
+
+
 ### Task 1: Install the tools
 
-** We already had installed the tools in others course so we had directly launch the docker-compose and we verified that we have 3 running containers :**
+**We already had installed the tools in others course so we had directly launch the docker-compose and we verified that we have 3 running containers :**
 
 ![Verify](assets/img/verify-containers-running.png)
 
-** The containers are connected by a network bridge : **
+**The containers are connected by a network bridge :**
 
 ![Verify2](assets/img/verify-bridge.png)
 
-
-** We can now navigate to the address of the load balancer : **
+**We can now navigate to the address of the load balancer : **
 
 ![BrowserCheck](assets/img/browser-check.png)
 
@@ -22,15 +27,15 @@ _Authors : Nair Alic & Adam Zouari_
 
 1. Explain how the load balancer behaves when you open and refresh the URL <http://192.168.42.42> in your browser. Add screenshots to complement your explanations. We expect that you take a deeper a look at session management.
 	
-	** When we open the URL a first time, the server `s1` respond with `gfGB....` as the session ID.**
+	**When we open the URL a first time, the server `s1` respond with `gfGB....` as the session ID.**
 	
 	![Before-Refresh](assets/img/before-refresh.png)
 	
-	** After a refresh, it's now the server `s2` who respond with another session ID.**
+	**After a refresh, it's now the server `s2` who respond with another session ID.**
 	
 	![After-Refresh](assets/img/after-refresh.png)
 	
-	** At each request the sessionID changes. The load balancer seems not to care about the session management and use a Round Robin (One request per server in a uniform rotation) schedule policy to determine to which server a request should be sent.**
+	**At each request the sessionID changes. The load balancer seems not to care about the session management and use a Round Robin (One request per server in a uniform rotation) schedule policy to determine to which server a request should be sent.**
 
 2. Explain what should be the correct behavior of the load balancer for session management.
 	
@@ -43,7 +48,7 @@ _Authors : Nair Alic & Adam Zouari_
 
 4. Provide a screenshot of the summary report from JMeter.
 
-	** Wee that the load is uniformly distributed between the two servers.**
+	**Wee that the load is uniformly distributed between the two servers. **
 	
 	![JMETER-SummaryReport](assets/img/summary-report-jmeter.png)
 
@@ -54,13 +59,13 @@ _Authors : Nair Alic & Adam Zouari_
   ```
 
   Clear the results in JMeter and re-run the test plan. Explain what is happening when only one node remains active. Provide another sequence diagram using the same model as the previous one.
-  
-  ** Obviously after stop the server `s1`, all requests are handled by the second server `s2`.**
-  
+
+  **Obviously after stop the server `s1`, all requests are handled by the second server `s2`.**
+
  ![JMETER-SummaryReport](assets/img/summary-report-jmeter-after-stop-s1.png)
- 
+
  ** Therefore, after a refresh, the server remember that a request with thissession ID have already been made so the `sessionViews` is correctly incremented.**
- 
+
  ![After-Refresh](assets/img/session-id-after-stop-s1.png)
 
 ### Task 2: Sticky sessions
@@ -72,25 +77,24 @@ For that, you will have to play with docker a little bit more. You might want to
 **Deliverables:**
 
 1. There is different way to implement the sticky session. One possibility is to use the SERVERID provided by HAProxy. Another way is to use the NODESESSID provided by the application. Briefly explain the difference between both approaches (provide a sequence diagram with cookies to show the difference).</br>
-** In the case of SERVERID, HAProxy will send the cookie in the first response. In the next request, the cookie will be sent by the client, and used by HAProxy to determine which server to forward the request. 
-For NODESESSID, this is the application server which will send the cookie in the first response.
-**
+**In the case of SERVERID, HAProxy will send the cookie in the first response. In the next request, the cookie will be sent by the client, and used by HAProxy to determine which server to forward the request. 
+For NODESESSID, this is the application server which will send the cookie in the first response.**
   * Choose one of the both stickiness approach for the next tasks.</br>
-  ** For the next tasks we will use the SERVERID way.**
+    **For the next tasks we will use the SERVERID way.**
 
 2. Provide the modified `haproxy.cfg` file with a short explanation of the modifications you did to enable sticky session management.</br>
 ![](assets/img/config-hap.png)</br>
-** The blue line tells HAProxy to setup a cookie called SERVERID only if the user didn't come with suche one. In red, it provides the value of the cookie inserted by HAProxy to know which server to choose for this client.**
+**The blue line tells HAProxy to setup a cookie called SERVERID only if the user didn't come with suche one. In red, it provides the value of the cookie inserted by HAProxy to know which server to choose for this client. **
 3. Explain what is the behavior when you open and refresh the URL <http://192.168.42.42> in your browser. Add screenshots to complement your explanations. We expect that you take a deeper a look at session management.</br>
 ![](assets/img/serverid.png)</br>
-** Now the session management seems to be correct. After a refresh we see that the value of `sessionViews` is 2 and the SERVERID cookie is set to s1.**
+**Now the session management seems to be correct. After a refresh we see that the value of `sessionViews` is 2 and the SERVERID cookie is set to s1.**
 
 4. Provide a sequence diagram to explain what is happening when one requests the URL for the first time and then refreshes the page. We want to see what is happening with the cookie. We want to see the sequence of messages exchanged (1) between the browser and HAProxy and (2) between HAProxy and the nodes S1 and S2. We also want to see what is happening when a second browser is used.</br>
 ** TODO**
 
 5. Provide a screenshot of JMeter's summary report. Is there a difference with this run and the run of Task 1?</br>
 ![](assets/img/summary-report-jmeter-task2.png)</br>
-** The behaviour is the same that when we stopped one of the server. All request reach one of the server because they all use the same SERVERID.**
+**The behaviour is the same that when we stopped one of the server. All request reach one of the server because they all use the same SERVERID.**
 
   * Clear the results in JMeter.
 
@@ -135,15 +139,15 @@ running called `s1` and `s2`.
    
    ![](assets/img/stats-hap-s1-drain.png)
    
-   ** Now we see that the status of s1 is DRAIN.**
+   **Now we see that the status of s1 is DRAIN.**
    
 3. Refresh your browser and explain what is happening. Tell us if you stay on the same node or not. If yes, why? If no, why?
 	
-	** After refreshing our browser, s1 still responding. That is because HAProxy will let current sessions continue to make requests to the node in DRAIN mode and will redirect all other traffic to the other nodes.**
+	**After refreshing our browser, s1 still responding. That is because HAProxy will let current sessions continue to make requests to the node in DRAIN mode and will redirect all other traffic to the other nodes. **
 
 4. Open another browser and open `http://192.168.42.42`. What is happening?
 	
-	** There is no change because the browser still have the cookie of the of the previous connection. s1 still responding. **
+	**There is no change because the browser still have the cookie of the of the previous connection. s1 still responding.**
 
 5. Clear the cookies on the new browser and repeat these two steps multiple times. What is happening? Are you reaching the node in DRAIN mode?
 	
@@ -151,20 +155,22 @@ running called `s1` and `s2`.
 
 6. Reset the node in READY mode. Repeat the three previous steps and explain what is happening. Provide a screenshot of HAProxy's stats page.
 	
-	** To get back in READY mode : **
-	```bash
-	set server nodes/s1 state ready
-	```
-	** Now, HAProxy use RoundRobin to redirect the requests between the two nodes.**
+	**To get back in READY mode : **
 	
-	![](assets/img/stats-hap-s1-drain.png)
-
-7. Finally, set the node in MAINT mode. Redo the three same steps and explain what is happening. Provide a screenshot of HAProxy's stats page.
-	** To switch in MAINT mode : **
 	```bash
 	set server nodes/s1 state ready
 	```
-	** Now, in MAINT mode, HAProxy will redirect ALL requests to the node s2. Even the current sessions wil be redirect to it and we will lose the session (counter restarted).**
+	**Now, HAProxy use RoundRobin to redirect the requests between the two nodes.**
+	
+![](assets/img/stats-hap-s1-drain.png)
+	
+7. Finally, set the node in MAINT mode. Redo the three same steps and explain what is happening. Provide a screenshot of HAProxy's stats page.
+	**To switch in MAINT mode :**
+	
+	```bash
+	set server nodes/s1 state ready
+	```
+	**Now, in MAINT mode, HAProxy will redirect ALL requests to the node s2. Even the current sessions wil be redirect to it and we will lose the session (counter restarted).**
 	
 	![](assets/img/stats-hap-s1-maint.png)
 
@@ -215,17 +221,17 @@ concurrent users.
 
 1. Be sure the delay is of 0 milliseconds is set on `s1`. Do a run to have base data to compare with the next experiments.
 
-	** To be sure that the delay are set on 0 on s1, we do a POST with 0 as the delay value.**
+	**To be sure that the delay are set on 0 on s1, we do a POST with 0 as the delay value.**
 	
 	![](assets/img/set-delay-0.png)
 	
-	** The following results will be a base to compare with the next experiments. **
+	**The following results will be a base to compare with the next experiments. **
 	
 	![](assets/img/base-result.png)
 
 2. Set a delay of 250 milliseconds on `s1`. Relaunch a run with the JMeter script and explain what it is happening?
 
-	** Wee that the throughput is 10 times less than the base result. Therefore HAProxy still manage correctly the requests.**
+	**Wee that the throughput is 10 times less than the base result. Therefore HAProxy still manage correctly the requests.**
 	
 	![](assets/img/250ms-result.png)
 
@@ -251,9 +257,55 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 1. Briefly explain the strategies you have chosen and why you have chosen them.
 
+**In the HAProxy documentation there are many different type of load balancing strategies. We've decided to choose these two :**
+
+**first : This strategy is simple. The first server with available connections will receive the connection. They are chosen from the lowest to the highest ID. When the server reaches the "maxconn" value, the next server is used. But we have to be sure to set the "maxconn" setting if not, it doesn't make sense to use this strategy.**
+
+**leastconn : In this case, the server with the lowest number of connections will receive the connection. If multiple servers may be chosen, round robin is performed to ensure to use them all at lease one time. This strategy is not very well recommended for short HTTP sessions. But in case of long sessions such as LDAP, SQL, etc. it's a quite good strategy. **
+
 2. Provide evidences that you have played with the two strategies (configuration done, screenshots, ...)
 
+**For both strategies, we have to change the configuration file "haproxy.cfg" in order to use it.  In the section "backend nodes",  you will find the balancing policy :** 
+
+![](/assets/img/balance_config.png)
+
+**As said, for the "first" strategy, we have to put a maxconn setting in order to have some results. For this you have to put in the section "global" the setting like this (We have tested with different maxconn values):**
+
+![](/assets/img/maxconn.png)
+
+**Here are the result for the "first" strategy :**
+
+![](/assets/img/first_strategy.png)
+
+**We see that the connection goes always to server 1 (10 users and 100 loops here). We have tried several configurations on Jmeter and in the "maxconn" setting (here maxconn is 1). The S1 always respond, it never balance to S2. This solution is not adapted for our use. **
+
+
+
+**For leastconn strategy, we have made few Jmeter load test and it seems to be a good load balancer. We have made two load test using cookies and not. The tests are made with 10 user and 100 loops.**
+
+**Here are the results using the cookies :**
+
+![](/assets/img/leastconn_withCookies.png)
+
+**We can see that the repartition is very good.**
+
+**Here are the results when not using cookies :**
+
+![](/assets/img/leastconn_withoutCookies.png)
+
+**Results are not bad at all. **
+
 3. Compare the both strategies and conclude which is the best for this lab (not necessary the best at all).
+
+**In comparison, we see that these two strategies are quite different. They have advantage and disadvantage. Before choosing one, we have to be sure what we want to do. The "first" strategy doesn't suit well for this lab, as we want to give charges on both server not only on one. So the best one between these two is the "leastconn" one, as we can see the results, the charges are well balanced between the two servers. **
+
+
+
+### Conclusion
+
+...
+
+
 
 #### References
 
