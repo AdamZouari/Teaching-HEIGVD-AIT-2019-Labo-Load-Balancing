@@ -18,7 +18,7 @@ _Authors : Nair Alic & Adam Zouari_
 
 ![Verify2](assets/img/verify-bridge.png)
 
-**We can now navigate to the address of the load balancer : **
+**We can now navigate to the address of the load balancer :**
 
 ![BrowserCheck](assets/img/browser-check.png)
 
@@ -39,7 +39,7 @@ _Authors : Nair Alic & Adam Zouari_
 
 2. Explain what should be the correct behavior of the load balancer for session management.
 	
-	**The second request also should been handled by server `s1`, the `id` should have been the same as the first resquest and the `sessionViews` should have been incremented. **
+	**The second request also should been handled by server `s1`, the `id` should have been the same as the first resquest and the `sessionViews` should have been incremented.**
 
 3. Provide a sequence diagram to explain what is happening when one requests the URL for the first time and then refreshes the page. We want to see what is happening with the cookie. We want to see the sequence of messages exchanged (1) between the browser and HAProxy and (2) between HAProxy and the nodes S1 and S2. Here is an example:
 
@@ -48,7 +48,7 @@ _Authors : Nair Alic & Adam Zouari_
 
 4. Provide a screenshot of the summary report from JMeter.
 
-	**Wee that the load is uniformly distributed between the two servers. **
+	**Wee that the load is uniformly distributed between the two servers.**
 	
 	![JMETER-SummaryReport](assets/img/summary-report-jmeter.png)
 
@@ -64,7 +64,7 @@ _Authors : Nair Alic & Adam Zouari_
 
  ![JMETER-SummaryReport](assets/img/summary-report-jmeter-after-stop-s1.png)
 
- ** Therefore, after a refresh, the server remember that a request with thissession ID have already been made so the `sessionViews` is correctly incremented.**
+ **Therefore, after a refresh, the server remember that a request with thissession ID have already been made so the `sessionViews` is correctly incremented.**
 
  ![After-Refresh](assets/img/session-id-after-stop-s1.png)
 
@@ -84,7 +84,7 @@ For NODESESSID, this is the application server which will send the cookie in the
 
 2. Provide the modified `haproxy.cfg` file with a short explanation of the modifications you did to enable sticky session management.</br>
 ![](assets/img/config-hap.png)</br>
-**The blue line tells HAProxy to setup a cookie called SERVERID only if the user didn't come with suche one. In red, it provides the value of the cookie inserted by HAProxy to know which server to choose for this client. **
+**The blue line tells HAProxy to setup a cookie called SERVERID only if the user didn't come with suche one. In red, it provides the value of the cookie inserted by HAProxy to know which server to choose for this client.**
 3. Explain what is the behavior when you open and refresh the URL <http://192.168.42.42> in your browser. Add screenshots to complement your explanations. We expect that you take a deeper a look at session management.</br>
 ![](assets/img/serverid.png)</br>
 **Now the session management seems to be correct. After a refresh we see that the value of `sessionViews` is 2 and the SERVERID cookie is set to s1.**
@@ -143,7 +143,7 @@ running called `s1` and `s2`.
    
 3. Refresh your browser and explain what is happening. Tell us if you stay on the same node or not. If yes, why? If no, why?
 	
-	**After refreshing our browser, s1 still responding. That is because HAProxy will let current sessions continue to make requests to the node in DRAIN mode and will redirect all other traffic to the other nodes. **
+	**After refreshing our browser, s1 still responding. That is because HAProxy will let current sessions continue to make requests to the node in DRAIN mode and will redirect all other traffic to the other nodes.**
 
 4. Open another browser and open `http://192.168.42.42`. What is happening?
 	
@@ -155,7 +155,7 @@ running called `s1` and `s2`.
 
 6. Reset the node in READY mode. Repeat the three previous steps and explain what is happening. Provide a screenshot of HAProxy's stats page.
 	
-	**To get back in READY mode : **
+	**To get back in READY mode :**
 	
 	```bash
 	set server nodes/s1 state ready
@@ -225,7 +225,7 @@ concurrent users.
 	
 	![](assets/img/set-delay-0.png)
 	
-	**The following results will be a base to compare with the next experiments. **
+	**The following results will be a base to compare with the next experiments.**
 	
 	![](assets/img/base-result.png)
 
@@ -236,10 +236,10 @@ concurrent users.
 	![](assets/img/250ms-result.png)
 
 3. Set a delay of 2500 milliseconds on `s1`. Same than previous step.
-4. 
-	**Now, with ad delay of 2500 ms on s1, it is totally unreachable. All requests are routed to s2. **
-	
-	![](assets/img/2500ms-result.png)
+
+   **Now, with ad delay of 2500 ms on s1, it is totally unreachable. All requests are routed to s2.**
+
+   ![](assets/img/2500ms-result.png)
 
 4. In the two previous steps, are there any error? Why?
 
@@ -261,7 +261,7 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 **first : This strategy is simple. The first server with available connections will receive the connection. They are chosen from the lowest to the highest ID. When the server reaches the "maxconn" value, the next server is used. But we have to be sure to set the "maxconn" setting if not, it doesn't make sense to use this strategy.**
 
-**leastconn : In this case, the server with the lowest number of connections will receive the connection. If multiple servers may be chosen, round robin is performed to ensure to use them all at lease one time. This strategy is not very well recommended for short HTTP sessions. But in case of long sessions such as LDAP, SQL, etc. it's a quite good strategy. **
+**leastconn : In this case, the server with the lowest number of connections will receive the connection. If multiple servers may be chosen, round robin is performed to ensure to use them all at lease one time. This strategy is not very well recommended for short HTTP sessions. But in case of long sessions such as LDAP, SQL, etc. it's a quite good strategy.**
 
 2. Provide evidences that you have played with the two strategies (configuration done, screenshots, ...)
 
@@ -277,7 +277,7 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 ![](/assets/img/first_strategy.png)
 
-**We see that the connection goes always to server 1 (10 users and 100 loops here). We have tried several configurations on Jmeter and in the "maxconn" setting (here maxconn is 1). The S1 always respond, it never balance to S2. This solution is not adapted for our use. **
+**We see that the connection goes always to server 1 (10 users and 100 loops here). We have tried several configurations on Jmeter and in the "maxconn" setting (here maxconn is 1). The S1 always respond, it never balance to S2. This solution is not adapted for our use.**
 
 
 
@@ -293,11 +293,11 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 ![](/assets/img/leastconn_withoutCookies.png)
 
-**Results are not bad at all. **
+**Results are not bad at all.**
 
 3. Compare the both strategies and conclude which is the best for this lab (not necessary the best at all).
 
-**In comparison, we see that these two strategies are quite different. They have advantage and disadvantage. Before choosing one, we have to be sure what we want to do. The "first" strategy doesn't suit well for this lab, as we want to give charges on both server not only on one. So the best one between these two is the "leastconn" one, as we can see the results, the charges are well balanced between the two servers. **
+**In comparison, we see that these two strategies are quite different. They have advantage and disadvantage. Before choosing one, we have to be sure what we want to do. The "first" strategy doesn't suit well for this lab, as we want to give charges on both server not only on one. So the best one between these two is the "leastconn" one, as we can see the results, the charges are well balanced between the two servers.**
 
 
 
