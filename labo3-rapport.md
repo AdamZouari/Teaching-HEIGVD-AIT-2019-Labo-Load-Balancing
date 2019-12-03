@@ -4,9 +4,7 @@ _Authors : Nair Alic & Adam Zouari_
 
 ### Introduction
 
-...
-
-
+In this laboratory, we've been asked to deploy a web application in a two tier architecture. The laboratory is separated in 5 tasks, in each task we've been asked to configure and test the load balancer/proxy called HAProxy in different way. We also made several load tests using JMeter. 
 
 ### Task 1: Install the tools
 
@@ -302,6 +300,8 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 
 ### Conclusion
+
+This laboratory allowed us to the test in different way the tools JMeter and HAProxy, these are very useful and have many different options in order to test load balancing in a multi-tiered web application.
 
 ...
 
