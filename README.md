@@ -1,5 +1,3 @@
-title: Lab 03 - Load balancing
----
 
 ## Lab 03 - Load balancing
 
