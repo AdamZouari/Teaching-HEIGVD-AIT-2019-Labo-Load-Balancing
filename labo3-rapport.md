@@ -41,8 +41,7 @@ In this laboratory, we've been asked to deploy a web application in a two tier a
 
 3. Provide a sequence diagram to explain what is happening when one requests the URL for the first time and then refreshes the page. We want to see what is happening with the cookie. We want to see the sequence of messages exchanged (1) between the browser and HAProxy and (2) between HAProxy and the nodes S1 and S2. Here is an example:
 
-  ![Sequence diagram for part 1](assets/img/seq-diag-1.png)
-  ** TODO**
+  ![Sequence diagram for part 1](assets/img/Diagram1.png)
 
 4. Provide a screenshot of the summary report from JMeter.
 
@@ -88,7 +87,8 @@ For NODESESSID, this is the application server which will send the cookie in the
 **Now the session management seems to be correct. After a refresh we see that the value of `sessionViews` is 2 and the SERVERID cookie is set to s1.**
 
 4. Provide a sequence diagram to explain what is happening when one requests the URL for the first time and then refreshes the page. We want to see what is happening with the cookie. We want to see the sequence of messages exchanged (1) between the browser and HAProxy and (2) between HAProxy and the nodes S1 and S2. We also want to see what is happening when a second browser is used.</br>
-** TODO**
+
+  ![Sequence diagram for part 2](assets/img/Diagram2.png)
 
 5. Provide a screenshot of JMeter's summary report. Is there a difference with this run and the run of Task 1?</br>
 ![](assets/img/summary-report-jmeter-task2.png)</br>
@@ -158,10 +158,9 @@ running called `s1` and `s2`.
 	```bash
 	set server nodes/s1 state ready
 	```
-	**Now, HAProxy use RoundRobin to redirect the requests between the two nodes.**
-	
+	**Now, HAProxy use RoundRobin to redirect the requests between the two nodes.**	
 ![](assets/img/stats-hap-s1-drain.png)
-	
+
 7. Finally, set the node in MAINT mode. Redo the three same steps and explain what is happening. Provide a screenshot of HAProxy's stats page.
 	**To switch in MAINT mode :**
 	
@@ -255,47 +254,45 @@ We propose that you take the time to discover the different strategies in [HAPro
 
 1. Briefly explain the strategies you have chosen and why you have chosen them.
 
-**In the HAProxy documentation there are many different type of load balancing strategies. We've decided to choose these two :**
+	**In the HAProxy documentation there are many different type of load balancing strategies. We've decided to choose these two :**
 
-**first : This strategy is simple. The first server with available connections will receive the connection. They are chosen from the lowest to the highest ID. When the server reaches the "maxconn" value, the next server is used. But we have to be sure to set the "maxconn" setting if not, it doesn't make sense to use this strategy.**
+	**first : This strategy is simple. The first server with available connections will receive the connection. They are chosen from the lowest to the highest ID. When the server reaches the "maxconn" value, the next server is used. But we have to be sure to set the "maxconn" setting if not, it doesn't make sense to use this strategy.**
 
-**leastconn : In this case, the server with the lowest number of connections will receive the connection. If multiple servers may be chosen, round robin is performed to ensure to use them all at lease one time. This strategy is not very well recommended for short HTTP sessions. But in case of long sessions such as LDAP, SQL, etc. it's a quite good strategy.**
+	**leastconn : In this case, the server with the lowest number of connections will receive the connection. If multiple servers may be chosen, round robin is performed to ensure to use them all at lease one time. This strategy is not very well recommended for short HTTP sessions. But in case of long sessions such as LDAP, SQL, etc. it's a quite good strategy.**
 
 2. Provide evidences that you have played with the two strategies (configuration done, screenshots, ...)
 
-**For both strategies, we have to change the configuration file "haproxy.cfg" in order to use it.  In the section "backend nodes",  you will find the balancing policy :** 
+	**For both strategies, we have to change the configuration file "haproxy.cfg" in order to use it.  In the section "backend nodes",  you will find the balancing policy :** 
 
-![](/assets/img/balance_config.png)
+	![](assets/img/balance_config.png)
 
-**As said, for the "first" strategy, we have to put a maxconn setting in order to have some results. For this you have to put in the section "global" the setting like this (We have tested with different maxconn values):**
+	**As said, for the "first" strategy, we have to put a maxconn setting in order to have some results. For this you have to put in the section "global" the setting like this (We have tested with different maxconn values):**
 
-![](/assets/img/maxconn.png)
+	![](assets/img/maxconn.png)
 
-**Here are the result for the "first" strategy :**
+	**Here are the result for the "first" strategy :**
 
-![](/assets/img/first_strategy.png)
+	![](assets/img/first_strategy.png)
 
-**We see that the connection goes always to server 1 (10 users and 100 loops here). We have tried several configurations on Jmeter and in the "maxconn" setting (here maxconn is 1). The S1 always respond, it never balance to S2. This solution is not adapted for our use.**
+	**We see that the connection goes always to server 1 (10 users and 100 loops here). We have tried several configurations on Jmeter and in the "maxconn" setting (here maxconn is 1). The S1 always respond, it never balance to S2. This solution is not adapted for our use.**
 
+	**For leastconn strategy, we have made few Jmeter load test and it seems to be a good load balancer. We have made two load test using cookies and not. The tests are made with 10 user and 100 loops.**
 
+	**Here are the results using the cookies :**
 
-**For leastconn strategy, we have made few Jmeter load test and it seems to be a good load balancer. We have made two load test using cookies and not. The tests are made with 10 user and 100 loops.**
+	![](assets/img/leastconn_withCookies.png)
 
-**Here are the results using the cookies :**
+	**We can see that the repartition is very good.**
 
-![](/assets/img/leastconn_withCookies.png)
+	**Here are the results when not using cookies :**
 
-**We can see that the repartition is very good.**
+	![](assets/img/leastconn_withoutCookies.png)
 
-**Here are the results when not using cookies :**
-
-![](/assets/img/leastconn_withoutCookies.png)
-
-**Results are not bad at all.**
+	**Results are not bad at all.**
 
 3. Compare the both strategies and conclude which is the best for this lab (not necessary the best at all).
 
-**In comparison, we see that these two strategies are quite different. They have advantage and disadvantage. Before choosing one, we have to be sure what we want to do. The "first" strategy doesn't suit well for this lab, as we want to give charges on both server not only on one. So the best one between these two is the "leastconn" one, as we can see the results, the charges are well balanced between the two servers.**
+	**In comparison, we see that these two strategies are quite different. They have advantage and disadvantage. Before choosing one, we have to be sure what we want to do. The "first" strategy doesn't suit well for this lab, as we want to give charges on both server not only on one. So the best one between these two is the "leastconn" one, as we can see the results, the charges are well balanced between the two servers.**
 
 
 
@@ -305,50 +302,3 @@ This laboratory allowed us to the test in different way the tools JMeter and HAP
 
 ...
 
-
-
-#### References
-
-* [HAProxy Socket commands (drain, ready, ...)](https://cbonte.github.io/haproxy-dconv/configuration-1.5.html#9.2-set%20server)
-* [Socat util to run socket commands](http://www.dest-unreach.org/socat/)
-* [Socat command examples](https://stuff.mit.edu/afs/sipb/machine/penguin-lust/src/socat-1.7.1.2/EXAMPLES)
-
-#### Lab due date
-
-Deliver your results at the latest 15 minutes before class Wednesday, November 25.
-
-#### Windows troubleshooting
-
-git It appears that Windows users can encounter a `CRLF` vs. `LF` problem when the repos is cloned without taking care of the ending lines. Therefore, if the ending lines are `CRFL`, it will produce an error message with Docker:
-
-```bash
-... no such file or directory
-```
-
-(Take a look to this Docker issue: https://github.com/docker/docker/issues/9066, the last post show the error message).
-
-The error message is not really relevant and difficult to troubleshoot. It seems the problem is caused by the line endings not correctly interpreted by Linux when they are `CRLF` in place of `LF`. The problem is caused by cloning the repos on Windows with a system that will not keep the `LF` in the files.
-
-Fortunatelly, there is a procedure to fix the `CRLF` to `LF` and then be sure Docker will recognize the `*.sh` files.
-
-First, you need to add the file `.gitattributes` file with the following content:
-
-```bash
-* text eol=lf
-```
-
-This will ask the repos to force the ending lines to `LF` for every text files.
-
-Then, you need to reset your repository. Be sure you do not have **modified** files.
-
-```bash
-# Erease all the files in your local repository
-git rm --cached -r .
-
-# Restore the files from your local repository and apply the correct ending lines (LF)
-git reset --hard
-```
-
-Then, you are ready to go.
-
-There is a link to deeper explanation and procedure about the ending lines written by GitHub: https://help.github.com/articles/dealing-with-line-endings/
